@@ -1,0 +1,14 @@
+{
+  "Name": "MP RG Reader",
+  "IsCustom": true,
+  "Description": "Read-only role for a specific resource group",
+  "Actions": [
+    "*/read"
+  ],
+  "NotActions": [],
+  "DataActions": [],
+  "NotDataActions": [],
+  "AssignableScopes": [
+    "/subscriptions/0850c3fc-3875-4480-a39b-3604f9ce2ba2/resourceGroups/MP-Dev-RG"
+  ]
+}
