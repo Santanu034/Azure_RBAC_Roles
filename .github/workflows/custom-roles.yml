@@ -22,7 +22,6 @@ jobs:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}       # App Registration Client ID
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}       # Directory (Tenant) ID
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        auth-type: IDENTITY                             # 👈 tells azure/login to use OIDC
 
     - name: Deploy RG Admin Role
       run: |
