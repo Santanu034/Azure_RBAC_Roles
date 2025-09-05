@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+permissions:           # 👈 required for OIDC
+  id-token: write
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -12,37 +16,22 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v4
 
-    - name: Azure Login
+    - name: Azure Login (OIDC)
       uses: azure/login@v1
       with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}       # App Registration Client ID
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}       # Directory (Tenant) ID
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+        auth-type: IDENTITY                             # 👈 tells azure/login to use OIDC
 
     - name: Deploy RG Admin Role
       run: |
         echo "Deploying Custom RG Admin Role..."
-        az role definition create --role-definition roles/mp-rg-admin.json ||         az role definition update --role-definition roles/mp-rg-admin.json
+        az role definition create --role-definition roles/mp-rg-admin.json || \
+        az role definition update --role-definition roles/mp-rg-admin.json
 
     - name: Deploy RG Reader Role
       run: |
         echo "Deploying Custom RG Reader Role..."
-        az role definition create --role-definition roles/mp-rg-reader.json ||         az role definition update --role-definition roles/mp-rg-reader.json
-
-      # --- Assignments ---
-    # - name: Assign RG Admin to User
-    #   run: |
-    #     az role assignment create           --assignee <user-object-id-or-upn>           --role "Custom RG Admin"           --scope /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/<rg-name>
-
-    # - name: Assign RG Reader to Group
-    #   run: |
-    #     az role assignment create           --assignee <aad-group-object-id>           --role "Custom RG Reader"           --scope /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/<rg-name>
-
-    # - name: Assign RG Reader to Managed Identity
-    #   run: |
-    #     az role assignment create           --assignee <managed-identity-object-id>           --role "Custom RG Reader"           --scope /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/<rg-name>
-
-    # - name: Assign RG Admin to Service Principal
-    #   run: |
-    #     az role assignment create           --assignee <service-principal-object-id>           --role "Custom RG Admin"           --scope /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/<rg-name>
+        az role definition create --role-definition roles/mp-rg-reader.json || \
+        az role definition update --role-definition roles/mp-rg-reader.json
